@@ -4,6 +4,11 @@ import { auth } from '@/lib/auth';
 
 // ユーザーの役割を取得
 export async function GET(request: NextRequest) {
+  // ビルド時はPrismaクライアントを初期化しない
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    return NextResponse.json({ userRoles: [] });
+  }
+  
   const prisma = new PrismaClient();
   try {
     const session = await auth();
@@ -46,6 +51,11 @@ export async function GET(request: NextRequest) {
 
 // ユーザーの役割を更新
 export async function PUT(request: NextRequest) {
+  // ビルド時はPrismaクライアントを初期化しない
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    return NextResponse.json({ message: 'ビルド時は実行できません' });
+  }
+  
   const prisma = new PrismaClient();
   try {
     const session = await auth();
@@ -97,6 +107,11 @@ export async function PUT(request: NextRequest) {
 
 // ユーザーの役割を削除
 export async function DELETE(request: NextRequest) {
+  // ビルド時はPrismaクライアントを初期化しない
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    return NextResponse.json({ message: 'ビルド時は実行できません' });
+  }
+  
   const prisma = new PrismaClient();
   try {
     const session = await auth();

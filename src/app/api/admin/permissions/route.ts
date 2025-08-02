@@ -3,6 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import { auth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
+  // ビルド時はPrismaクライアントを初期化しない
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    return NextResponse.json({ permissions: [] });
+  }
+  
   const prisma = new PrismaClient();
   try {
     // セッション確認
