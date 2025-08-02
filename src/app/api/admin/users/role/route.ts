@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/lib/auth';
 
-const prisma = new PrismaClient();
-
 // ユーザーの役割を取得
 export async function GET(request: NextRequest) {
+  const prisma = new PrismaClient();
   try {
     const session = await auth();
     
@@ -40,11 +39,14 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('ユーザー役割取得エラー:', error);
     return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 // ユーザーの役割を更新
 export async function PUT(request: NextRequest) {
+  const prisma = new PrismaClient();
   try {
     const session = await auth();
     
@@ -88,11 +90,14 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('ユーザー役割更新エラー:', error);
     return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 // ユーザーの役割を削除
 export async function DELETE(request: NextRequest) {
+  const prisma = new PrismaClient();
   try {
     const session = await auth();
     
@@ -119,5 +124,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('ユーザー役割削除エラー:', error);
     return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 } 

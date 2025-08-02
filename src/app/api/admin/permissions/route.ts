@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/lib/auth';
 
-const prisma = new PrismaClient();
-
 export async function GET(request: NextRequest) {
+  const prisma = new PrismaClient();
   try {
     // セッション確認
     const session = await auth();
@@ -42,5 +41,7 @@ export async function GET(request: NextRequest) {
       { error: '権限取得中にエラーが発生しました。' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 } 

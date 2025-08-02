@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
-
 // システムプロンプトを更新
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const prisma = new PrismaClient();
   try {
     const session = await auth();
     
@@ -60,6 +59,8 @@ export async function PUT(
   } catch (error) {
     console.error('システムプロンプト更新エラー:', error);
     return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
@@ -68,6 +69,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const prisma = new PrismaClient();
   try {
     const session = await auth();
     
@@ -99,5 +101,7 @@ export async function DELETE(
   } catch (error) {
     console.error('システムプロンプト削除エラー:', error);
     return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 } 
