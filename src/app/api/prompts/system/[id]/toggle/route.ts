@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // システムプロンプトの状態を変更（アクティブ/非アクティブ）
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -21,7 +21,7 @@ export async function PUT(
       return NextResponse.json({ error: 'システムプロンプト状態変更には開発者権限が必要です' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // 既存のシステムプロンプトを確認
     const existingPrompt = await prisma.systemPrompt.findUnique({

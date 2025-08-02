@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // システムプロンプトを更新
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -21,7 +21,7 @@ export async function PUT(
       return NextResponse.json({ error: 'システムプロンプト編集には開発者権限が必要です' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { name, content, applicableTasks, priority, isActive } = body;
 
@@ -66,7 +66,7 @@ export async function PUT(
 // システムプロンプトを削除
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -80,7 +80,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'システムプロンプト削除には開発者権限が必要です' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // 既存のシステムプロンプトを確認
     const existingPrompt = await prisma.systemPrompt.findUnique({
