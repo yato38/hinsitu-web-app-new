@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  userId    String   @unique // ユーザーID（文字列）
+  name      String   // 氏名
+  password  String   // ハッシュ化されたパスワード
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // アクセス権限との関連
+  accessPermissions AccessPermission[]
+  
+  // 複数役割との関連
+  userRoles UserRole[]
+  
+  // プロンプトアップロードとの関連
+  promptUploads PromptUpload[]
+  
+  // システムプロンプトとの関連
+  systemPrompts SystemPrompt[]
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ユーザーとの関連
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+}
+
+model AccessPermission {
+  id        String   @id @default(cuid())
+  userId    String
+  subjectId String   // 科目ID
+  canAccess Boolean  @default(false)
+  canEdit   Boolean  @default(false)
+  canDelete Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ユーザーとの関連
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 科目テーブル
+model Subject {
+  id          String    @id @default(cuid())
+  subjectId   String    @unique // 科目ID（例：english, math）
+  subjectName String    // 科目名（例：英語、数学）
+  examType    String    @default("mock") // 試験種（mock: 模試, past: 過去問演習講座）
+  createdBy   String?   // 作成者ID
+  isDeleted   Boolean   @default(false) // 削除フラグ
+  deletedAt   DateTime? // 削除日時
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // タスク定義との関連
+  taskDefinitions TaskDefinition[]
+}
+
+model AdminSettings {
+  id          String   @id @default(cuid())
+  settingKey  String   @unique
+  settingValue String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// プロンプトアップロードテーブル
+model PromptUpload {
+  id          String   @id @default(cuid())
+  subjectId   String
+  taskId      String
+  fileType    FileType
+  fileName    String
+  fileContent String
+  description String?
+  version     String   @default("1.0")
+  isActive    Boolean  @default(true)
+  uploadedBy  String   // アップロードしたユーザーのID
+  uploadedAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // ユーザーとの関連
+  user User @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+}
+
+// システムプロンプトテーブル
+model SystemPrompt {
+  id              String   @id @default(cuid())
+  subjectId       String   // 科目ID
+  name            String   // プロンプト名
+  content         String   // プロンプト内容
+  applicableTasks String   // 適用可能なタスクIDの配列（JSON文字列）
+  priority        Int      @default(1) // 優先度（1: 最高, 2: 中, 3: 低）
+  isActive        Boolean  @default(true) // アクティブ状態
+  maxCount        Int      @default(3) // 最大数
+  createdBy       String   // 作成者ID
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // ユーザーとの関連
+  user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+}
+
+// AI設定テーブル
+model AIConfig {
+  id          String   @id @default(cuid())
+  name        String   // 設定名
+  model       String   // AIモデル名
+  apiKey      String   // APIキー（暗号化して保存）
+  isActive    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// タスク定義テーブル（新しい構造）
+model TaskDefinition {
+  id          String   @id @default(cuid())
+  subjectId   String   // 科目ID
+  examType    String   // 試験種（mock: 模試, past: 過去問演習講座）
+  files       Json     // ファイルとタスクの配列（JSON形式）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 科目との関連
+  subject Subject @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
+
+  @@unique([subjectId, examType])
+}
+
+// 作業進捗テーブル
+model WorkProgress {
+  id            String   @id @default(cuid())
+  userId        String   // ユーザーID（メールアドレス）
+  taskId        String   // タスクID
+  fileType      FileType // ファイルタイプ
+  questionNumber Int     // 大問番号（1-4）
+  referenceData String?  // 参照データ
+  aiOutput      String?  // AI出力
+  subjectId     String   // 科目ID
+  examType      String   // 試験種
+  completedAt   DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, taskId, fileType])
+}
+
+enum Role {
+  USER
+  DEVELOPER
+  WORKER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum FileType {
+  problem
+  answer
+  explanation
+  scoring
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
