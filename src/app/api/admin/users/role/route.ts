@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await auth();
     
-    if (!session || !(session.user.roles || []).includes('ADMIN')) {
+    if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: '権限がありません' }, { status: 403 });
     }
 
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await auth();
     
-    if (!session || !(session.user.roles || []).includes('ADMIN')) {
+    if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: '権限がありません' }, { status: 403 });
     }
 
@@ -96,7 +96,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const session = await auth();
     
-    if (!session || !(session.user.roles || []).includes('ADMIN')) {
+    if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: '権限がありません' }, { status: 403 });
     }
 
