@@ -12,15 +12,5 @@
     "DATABASE_URL": "postgresql://postgres:placeholder@db.placeholder.supabase.co:5432/postgres",
     "NEXTAUTH_URL": "https://hinsitu-web-app-new.vercel.app",
     "NODE_ENV": "production"
-  },
-  "build": {
-    "env": {
-      "DATABASE_URL": "@database_url",
-      "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
-      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
-      "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
-      "NEXTAUTH_SECRET": "@nextauth_secret",
-      "NEXTAUTH_URL": "@nextauth_url"
-    }
   }
 } 
