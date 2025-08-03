@@ -18,7 +18,7 @@
     "db:check-duplicates": "node scripts/check-duplicate-users.js",
     "db:list-users": "node scripts/list-users.js",
     "db:test-login": "node scripts/test-login.js",
-    "vercel-build": "prisma generate && next build",
+    "vercel-build": "next build",
     "deploy": "node scripts/deploy-vercel.js",
     "deploy:mcp": "node scripts/auto-deploy-mcp.js",
     "setup:supabase-vercel": "node scripts/setup-supabase-vercel.js",
