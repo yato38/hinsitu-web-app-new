@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "db:seed": "tsx prisma/seed.ts",
@@ -20,7 +20,7 @@
     "db:list-users": "node scripts/list-users.js",
     "db:test-login": "node scripts/test-login.js",
     "pre-deploy": "npm run db:backup",
-    "vercel-build": "npm run build",
+    "vercel-build": "prisma generate && next build",
     "deploy": "node scripts/deploy-vercel.js"
   },
   "dependencies": {

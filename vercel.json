@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "prisma generate && npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm install",
@@ -9,6 +9,7 @@
     }
   },
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "DATABASE_URL": "file:./prod.db"
   }
 } 
