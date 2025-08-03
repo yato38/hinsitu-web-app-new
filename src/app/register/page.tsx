@@ -59,7 +59,8 @@ export default function RegisterPage() {
         router.push('/login?message=registration-success');
       }
     } catch (error) {
-      setError('登録中にエラーが発生しました。');
+      console.error('Registration error:', error);
+      setError('ネットワークエラーが発生しました。インターネット接続を確認してください。');
     } finally {
       setIsLoading(false);
     }

@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { SupabaseAuthService } from "./supabase-auth";
 
 const prisma = new PrismaClient();
 
@@ -18,43 +19,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            userId: credentials.userId
-          },
-          include: {
-            userRoles: true
+        try {
+          // SupabaseAuthServiceを使用してユーザー認証
+          const user = await SupabaseAuthService.getPrismaUserByUserId(credentials.userId as string);
+
+          if (!user) {
+            return null;
           }
-        });
 
-        if (!user) {
+          const isPasswordValid = await SupabaseAuthService.verifyPassword(
+            credentials.userId as string,
+            credentials.password as string
+          );
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          // ユーザーの役割を配列として取得
+          const roles = user.userRoles ? user.userRoles.map(ur => ur.role) : [];
+          // 従来の単一役割との互換性のため、メインの役割も含める
+          if (user.role && !roles.includes(user.role)) {
+            roles.push(user.role);
+          }
+
+          return {
+            id: user.id,
+            userId: user.userId,
+            name: user.name,
+            role: user.role,
+            roles: roles,
+            password: '******', // セキュリティのためダミーパスワードを表示
+          };
+        } catch (error) {
+          console.error('Authentication error:', error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        // ユーザーの役割を配列として取得
-        const roles = user.userRoles.map(ur => ur.role);
-        // 従来の単一役割との互換性のため、メインの役割も含める
-        if (user.role && !roles.includes(user.role)) {
-          roles.push(user.role);
-        }
-
-        return {
-          id: user.id,
-          userId: user.userId,
-          name: user.name,
-          role: user.role,
-          roles: roles,
-          password: '******', // セキュリティのためダミーパスワードを表示
-        };
       }
     })
   ],

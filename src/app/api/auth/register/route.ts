@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { SupabaseAuthService } from '@/lib/supabase-auth';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    // Vercel環境ではデータベース機能を無効化
-    if (process.env.NODE_ENV === 'production' && process.env.VERCEL) {
-      return NextResponse.json(
-        { error: '本番環境ではユーザー登録機能は利用できません。' },
-        { status: 503 }
-      );
-    }
+    // 本番環境での登録制限を解除
+    // if (process.env.NODE_ENV === 'production' && process.env.VERCEL) {
+    //   return NextResponse.json(
+    //     { error: '本番環境ではユーザー登録機能は利用できません。' },
+    //     { status: 503 }
+    //   );
+    // }
 
     const { userId, name, password } = await request.json();
 
@@ -50,34 +51,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // パスワードのハッシュ化
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // ユーザーの作成
-    const user = await prisma.user.create({
-      data: {
-        userId,
-        name,
-        password: hashedPassword,
-        role: 'USER', // デフォルトは一般ユーザー
-      },
-    });
+    // SupabaseとPrismaの両方でユーザーを作成
+    const { supabaseUser, prismaUser } = await SupabaseAuthService.createUser(
+      userId,
+      name,
+      password,
+      'USER'
+    );
 
     // パスワードを除いてレスポンスを返す
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = prismaUser;
 
     return NextResponse.json(
       { 
         message: 'ユーザー登録が完了しました。',
-        user: userWithoutPassword 
+        user: userWithoutPassword,
+        supabaseUserId: supabaseUser?.id
       },
       { status: 201 }
     );
 
   } catch (error) {
     console.error('Registration error:', error);
+    
+    // エラーメッセージをより詳細に
+    let errorMessage = '登録中にエラーが発生しました。';
+    if (error instanceof Error) {
+      if (error.message.includes('Supabase user creation failed')) {
+        errorMessage = '認証システムでのユーザー作成に失敗しました。';
+      } else if (error.message.includes('duplicate key')) {
+        errorMessage = 'このユーザーIDは既に使用されています。';
+      }
+    }
+    
     return NextResponse.json(
-      { error: '登録中にエラーが発生しました。' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
