@@ -4,8 +4,8 @@ import { auth } from '@/lib/auth';
 
 // ユーザーの役割を取得
 export async function GET(request: NextRequest) {
-  // ビルド時はPrismaクライアントを初期化しない
-  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+  // データベースURLが設定されていない場合は空の配列を返す
+  if (!process.env.DATABASE_URL) {
     return NextResponse.json({ userRoles: [] });
   }
   
@@ -51,9 +51,9 @@ export async function GET(request: NextRequest) {
 
 // ユーザーの役割を更新
 export async function PUT(request: NextRequest) {
-  // ビルド時はPrismaクライアントを初期化しない
-  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
-    return NextResponse.json({ message: 'ビルド時は実行できません' });
+  // データベースURLが設定されていない場合はエラーを返す
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json({ error: 'データベースが設定されていません' }, { status: 500 });
   }
   
   const prisma = new PrismaClient();
@@ -107,9 +107,9 @@ export async function PUT(request: NextRequest) {
 
 // ユーザーの役割を削除
 export async function DELETE(request: NextRequest) {
-  // ビルド時はPrismaクライアントを初期化しない
-  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
-    return NextResponse.json({ message: 'ビルド時は実行できません' });
+  // データベースURLが設定されていない場合はエラーを返す
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json({ error: 'データベースが設定されていません' }, { status: 500 });
   }
   
   const prisma = new PrismaClient();

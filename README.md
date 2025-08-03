@@ -1,50 +1,99 @@
 # 品質管理システム - フロントエンド
 
 ## 概要
+
 大学入試模試の品質管理業務を行うためのWebアプリケーションです。
+
+## デプロイ情報
+
+### Vercelデプロイ
+
+このプロジェクトはVercelにデプロイされています：
+
+- **本番URL**: https://hinsitu-web-app-new.vercel.app
+- **GitHubリポジトリ**: https://github.com/yato38/hinsitu-web-app-new
+- **Vercelプロジェクト**: https://vercel.com/yatos-projects-632ec345/hinsitu-web-app-new/deployments
+
+### デプロイ手順
+
+1. **GitHubリポジトリの準備**
+   ```bash
+   git add .
+   git commit -m "Vercelデプロイ用の設定を追加"
+   git push origin main
+   ```
+
+2. **Vercelでの設定**
+   - Vercelダッシュボードで「New Project」を選択
+   - GitHubリポジトリ `yato38/hinsitu-web-app-new` をインポート
+   - フレームワークプリセットで「Next.js」を選択
+   - 環境変数を設定（後述）
+
+3. **環境変数の設定**
+   Vercelダッシュボードの「Settings」→「Environment Variables」で以下を設定：
+   ```
+   DATABASE_URL=file:./prod.db
+   NEXTAUTH_URL=https://hinsitu-web-app-new.vercel.app
+   NEXTAUTH_SECRET=your-production-secret-key-here
+   OPENAI_API_KEY=your_openai_api_key_here
+   NOTION_TOKEN=your_notion_integration_token_here
+   NODE_ENV=production
+   ```
+
+4. **デプロイ**
+   - 「Deploy」ボタンをクリック
+   - ビルドが完了するまで待機
 
 ## 進捗状況
 
 ### ✅ 完了済み機能
 
-#### 1. ホーム画面 (`/`)
-- ユーザー情報表示（山本崇翔、ID: 750914）
-- 科目選択カード（英語、国語、数学）
-- 国語・数学は「開発中」表示
-- 作業状況サマリー（完了タスク、進行中タスク、未着手タスク）
+#### 1\. ホーム画面 (`/`)
 
-#### 2. 科目選択画面 (`/subjects/[subject]`)
-- 試験種選択（過去問演習、模試）
-- 模試選択時の作業工程一覧表
-- タスクID 1-19の全表示（存在しないタスクは「-」表示）
-- 備考列の追加（把握系、全訳系、剽窃はないか、など）
-- 4ファイル別タスク表示：
-  - 📄 英語_模試_問題用紙
-  - ✏️ 英語_模試_解答用紙
-  - 📖 英語_模試_解答解説
-  - 📊 英語_模試_採点基準
+* ユーザー情報表示（山本崇翔、ID: 750914）
+* 科目選択カード（英語、国語、数学）
+* 国語・数学は「開発中」表示
+* 作業状況サマリー（完了タスク、進行中タスク、未着手タスク）
 
-#### 3. タスク実行画面 (`/subjects/[subject]/tasks/[taskId]`)
-- 大問別入力フォーム（第1問、第2問、第3問）
-- AI品質チェック機能（OpenAI API連携）
-- 結果表示エリア
-- タブ切り替え機能
+#### 2\. 科目選択画面 (`/subjects/[subject]`)
 
-#### 4. データ構造
-- `src/data/subjectTasks.ts`でタスクデータを一元管理
-- CSVファイル（タスク.csv）に基づく正確なタスク定義
-- 科目別開発対応の拡張性確保
+* 試験種選択（過去問演習、模試）
+* 模試選択時の作業工程一覧表
+* タスクID 1-19の全表示（存在しないタスクは「-」表示）
+* 備考列の追加（把握系、全訳系、剽窃はないか、など）
+* 4ファイル別タスク表示：  
+   * 📄 英語\_模試\_問題用紙  
+   * ✏️ 英語\_模試\_解答用紙  
+   * 📖 英語\_模試\_解答解説  
+   * 📊 英語\_模試\_採点基準
+
+#### 3\. タスク実行画面 (`/subjects/[subject]/tasks/[taskId]`)
+
+* 大問別入力フォーム（第1問、第2問、第3問）
+* AI品質チェック機能（OpenAI API連携）
+* 結果表示エリア
+* タブ切り替え機能
+
+#### 4\. データ構造
+
+* `src/data/subjectTasks.ts`でタスクデータを一元管理
+* CSVファイル（タスク.csv）に基づく正確なタスク定義
+* 科目別開発対応の拡張性確保
 
 ### 🔧 技術仕様
 
 #### フレームワーク・ライブラリ
-- **Next.js 15.4.5** (App Router)
-- **React 18** (Hooks)
-- **TypeScript**
-- **Tailwind CSS**
-- **OpenAI API** (品質チェック機能)
+
+* **Next.js 15.4.5** (App Router)
+* **React 18** (Hooks)
+* **TypeScript**
+* **Tailwind CSS**
+* **OpenAI API** (品質チェック機能)
+* **Prisma** (データベースORM)
+* **NextAuth** (認証)
 
 #### ディレクトリ構造
+
 ```
 src/
 ├── app/
@@ -62,79 +111,97 @@ src/
 ├── data/
 │   └── subjectTasks.ts            # タスクデータ定義
 └── globals.css                    # グローバルスタイル
+
 ```
 
 ### 📊 タスクデータ仕様
 
 #### 英語科目のタスク構成
-- **タスクID**: 1-19（昇順表示）
-- **備考**: タスク分類（把握系、全訳系、剽窃はないか、など）
-- **ファイル別適用**: 4ファイル（問題用紙、解答用紙、解答解説、採点基準）に応じてタスクを振り分け
+
+* **タスクID**: 1-19（昇順表示）
+* **備考**: タスク分類（把握系、全訳系、剽窃はないか、など）
+* **ファイル別適用**: 4ファイル（問題用紙、解答用紙、解答解説、採点基準）に応じてタスクを振り分け
 
 #### データソース
-- `タスク.csv`ファイルに基づく正確なタスク定義
-- 各ファイルで適用されるタスクと適用されないタスク（「-」）を明確に区別
+
+* `タスク.csv`ファイルに基づく正確なタスク定義
+* 各ファイルで適用されるタスクと適用されないタスク（「-」）を明確に区別
 
 ### 🚧 開発中・未実装機能
 
 #### 過去問演習機能
-- 現在は「開発中」メッセージのみ表示
-- 将来的な実装予定
+
+* 現在は「開発中」メッセージのみ表示
+* 将来的な実装予定
 
 #### 国語・数学科目
-- 現在は「開発中」表示
-- 英語科目の実装完了後に順次開発予定
+
+* 現在は「開発中」表示
+* 英語科目の実装完了後に順次開発予定
 
 ### 🚀 デプロイ情報
 
-- **本番環境**: [品質管理システム](https://quality-control-system.vercel.app)
-- **GitHubリポジトリ**: [quality-control-system](https://github.com/YOUR_USERNAME/quality-control-system)
+* **本番環境**: 品質管理システム
+* **GitHubリポジトリ**: quality-control-system
 
 ### 🎯 次のステップ
 
-1. **機能拡張**
-   - 過去問演習機能の実装
-   - 国語・数学科目の開発
-   - ユーザー認証機能
-
-2. **品質向上**
-   - エラーハンドリングの強化
-   - レスポンシブデザインの改善
-   - パフォーマンス最適化
+1. **機能拡張**  
+   * 過去問演習機能の実装  
+   * 国語・数学科目の開発  
+   * ユーザー認証機能
+2. **品質向上**  
+   * エラーハンドリングの強化  
+   * レスポンシブデザインの改善  
+   * パフォーマンス最適化
 
 ## セットアップ・実行方法
 
 ### 前提条件
-- Node.js 18以上
-- npm または yarn
+
+* Node.js 18以上
+* npm または yarn
 
 ### インストール
+
 ```bash
 cd ai-web-app
 npm install
 ```
 
 ### 開発サーバー起動
+
 ```bash
 npm run dev
 ```
 
 ### 本番ビルド
+
 ```bash
 npm run build
 npm start
 ```
 
 ### 環境変数設定
+
 `.env.local`ファイルを作成し、以下を設定：
+
 ```
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key-here-change-in-production"
 OPENAI_API_KEY=your_openai_api_key_here
+NOTION_TOKEN=your_notion_integration_token_here
+NODE_ENV=development
 ```
 
 ## アクセス方法
-- 開発環境: http://localhost:3001
-- ホーム画面: http://localhost:3001/
-- 英語科目: http://localhost:3001/subjects/english
+
+* 開発環境: http://localhost:3001
+* 本番環境: https://hinsitu-web-app-new.vercel.app
+* ホーム画面: http://localhost:3001/
+* 英語科目: http://localhost:3001/subjects/english
 
 ## 作成者
+
 山本崇翔
