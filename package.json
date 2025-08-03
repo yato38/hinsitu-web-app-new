@@ -8,10 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:seed": "tsx prisma/seed.ts",
-    "db:backup": "node scripts/backup-db.js",
-    "db:restore": "node scripts/restore-db.js",
     "db:migrate": "prisma migrate deploy",
-    "db:migrate:safe": "node scripts/safe-migrate.js",
     "db:reset": "prisma migrate reset --force",
     "db:create-admin": "node scripts/create-admin.js",
     "db:update-admin-id": "node scripts/update-admin-id.js",
@@ -19,11 +16,6 @@
     "db:create-user": "node scripts/create-user.js",
     "db:list-users": "node scripts/list-users.js",
     "db:test-login": "node scripts/test-login.js",
-    "db:migrate-to-postgres": "node scripts/migrate-to-postgres.js",
-    "db:analyze-sqlite": "node scripts/analyze-sqlite-structure.js",
-    "db:generate-migration": "node scripts/migrate-to-supabase.js",
-    "db:verify-migration": "node scripts/verify-migration.js",
-    "pre-deploy": "npm run db:backup",
     "vercel-build": "prisma generate && next build",
     "deploy": "node scripts/deploy-vercel.js",
     "deploy:mcp": "node scripts/auto-deploy-mcp.js",
@@ -43,8 +35,7 @@
     "next-auth": "^5.0.0-beta.25",
     "openai": "^5.11.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "sqlite3": "^5.1.7"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
