@@ -6,6 +6,14 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
+    // Vercel環境ではデータベース機能を無効化
+    if (process.env.NODE_ENV === 'production' && process.env.VERCEL) {
+      return NextResponse.json(
+        { error: '本番環境ではユーザー登録機能は利用できません。' },
+        { status: 503 }
+      );
+    }
+
     const { userId, name, password } = await request.json();
 
     // バリデーション
