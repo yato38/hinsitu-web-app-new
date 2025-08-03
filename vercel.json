@@ -7,10 +7,5 @@
     "src/app/api/**/*.ts": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "DATABASE_URL": "postgresql://postgres:placeholder@db.placeholder.supabase.co:5432/postgres",
-    "NEXTAUTH_URL": "https://hinsitu-web-app-new.vercel.app",
-    "NODE_ENV": "production"
   }
 } 
